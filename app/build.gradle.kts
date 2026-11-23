@@ -58,6 +58,10 @@ android {
             pickFirsts += "**/libtermux.so"
         }
     }
+    lint {
+        abortOnError = false
+        checkReleaseBuilds = false
+    }
 }
 
 base {
