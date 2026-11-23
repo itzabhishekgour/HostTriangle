@@ -1,0 +1,46 @@
+# Android Studio & IntelliJ IDEA
+.idea/
+*.iml
+.DS_Store
+/captures
+
+# Gradle & Build Caches
+.gradle/
+.kotlin/
+/build/
+/*/build/
+.cxx/
+/*/cxx/
+.externalNativeBuild/
+/*/externalNativeBuild/
+
+# Local Machine SDK Configuration (Contains local user paths)
+local.properties
+
+# Crash Logs & Runtime Dumps
+*.log
+hs_err_pid*
+replay_pid*
+
+# Security & Keystores (Never commit signing keys or secrets)
+*.jks
+*.keystore
+*.p8
+*.p12
+*.key
+*.pem
+.env*
+secrets.*
+
+# OS / Temporary files
+Thumbs.db
+*.tmp
+*.bak
+*.swp
+*~
+
+# Loose binaries & archives in root
+/*.deb
+/*.tar.xz
+/*.zip
+/*.jar

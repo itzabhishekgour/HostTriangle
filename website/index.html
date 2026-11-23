@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HostTriangle — Distributed Edge Compute Nodes for Android</title>
+  <meta name="description" content="Turn spare Android phones into always-on edge compute nodes. Host Java (Spring Boot), Node.js, and Python backends with Cloudflare Zero Trust Tunnels." />
+  <link rel="icon" type="image/png" href="assets/hosttriangle_icon.png" />
+  <link rel="canonical" href="https://hosttriangle.tinexus.in/" />
+
+  <!-- OpenGraph / Social Meta Tags -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://hosttriangle.tinexus.in/" />
+  <meta property="og:title" content="HostTriangle — Distributed Edge Compute Nodes for Android" />
+  <meta property="og:description" content="Turn spare Android phones into always-on edge compute nodes. Avoid cloud inactivity spin-downs without router port forwarding. Code and secrets stay on your device." />
+  <meta property="og:image" content="https://hosttriangle.tinexus.in/assets/hosttriangle_logo_full.png" />
+
+  <!-- Twitter Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="HostTriangle — Distributed Edge Compute Nodes for Android" />
+  <meta name="twitter:description" content="Run Java, Node.js, and Python backends 24/7 on Android hardware with Cloudflare Zero Trust Tunnels." />
+  <meta name="twitter:image" content="https://hosttriangle.tinexus.in/assets/hosttriangle_logo_full.png" />
+
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              950: '#060911',
+              900: '#0B0F19',
+              850: '#101626',
+              800: '#161F36',
+              700: '#1F2B48',
+              border: '#233052',
+              emerald: '#10B981',
+              emeraldHover: '#059669',
+              emeraldLight: '#34D399',
+              cyan: '#06B6D4',
+              blue: '#3B82F6',
+              purple: '#8B5CF6'
+            }
+          },
+          animation: {
+            'pulse-subtle': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'float': 'float 6s ease-in-out infinite',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-8px)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Subtle background grid pattern */
+    .bg-grid-pattern {
+      background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+    .glow-emerald {
+      box-shadow: 0 0 60px -15px rgba(16, 185, 129, 0.28);
+    }
+    .glow-cyan {
+      box-shadow: 0 0 60px -15px rgba(6, 182, 212, 0.22);
+    }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0B0F19;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1F2B48;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #10B981;
+    }
+  </style>
+</head>
+<body class="bg-brand-950 text-slate-100 font-sans antialiased selection:bg-brand-emerald selection:text-slate-950">
+
+  <!-- ================= TOP NOTIFICATION PILL ================= -->
+  <div class="bg-gradient-to-r from-brand-950 via-brand-850 to-brand-950 border-b border-brand-border/60 py-1.5 sm:py-2 px-3 sm:px-4 text-center text-xs text-slate-300">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
+      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 whitespace-nowrap">
+        v0.1.0-BETA
+      </span>
+      <span class="text-[11px] sm:text-xs">Early release: test on your own device before relying on it.</span>
+      <a href="https://github.com/itzabhishekgour/HostTriangle" target="_blank" rel="noopener noreferrer" class="font-semibold text-emerald-400 hover:text-emerald-300 inline-flex items-center space-x-1 whitespace-nowrap text-[11px] sm:text-xs">
+        <span>Star on GitHub</span>
+        <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-current" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- ================= NAVBAR ================= -->
+  <header class="sticky top-0 z-40 backdrop-blur-xl bg-brand-950/85 border-b border-brand-border/70 transition-all">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <!-- Brand Logo -->
+      <a href="#" class="flex items-center space-x-2.5 sm:space-x-3 group">
+        <div class="relative w-8 h-8 sm:w-9 sm:h-9 rounded-xl p-0.5 bg-gradient-to-br from-emerald-500 to-cyan-500 shadow-md shadow-emerald-500/20 shrink-0">
+          <img src="assets/hosttriangle_icon.png" alt="HostTriangle Emblem" class="w-full h-full rounded-[10px] bg-brand-950 object-cover" />
+        </div>
+        <img src="assets/hosttriangle_text.png" alt="HostTriangle" class="h-5 sm:h-6 w-auto object-contain group-hover:brightness-110 transition" />
+      </a>
+
+      <!-- Desktop Nav -->
+      <nav class="hidden md:flex items-center space-x-7 text-sm font-medium text-slate-300">
+        <a href="#why" class="hover:text-emerald-400 transition">Why HostTriangle</a>
+        <a href="#architecture" class="hover:text-emerald-400 transition">Architecture</a>
+        <a href="#comparison" class="hover:text-emerald-400 transition">Comparison</a>
+        <a href="#screenshots" class="hover:text-emerald-400 transition">Screenshots</a>
+        <a href="#privacy" class="hover:text-emerald-400 transition">Local Privacy</a>
+        <a href="#faq" class="hover:text-emerald-400 transition">FAQ</a>
+      </nav>
+
+      <!-- Desktop Actions -->
+      <div class="hidden sm:flex items-center space-x-3">
+        <a href="https://github.com/itzabhishekgour/HostTriangle" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-lg border border-brand-border hover:border-slate-500 text-xs font-semibold text-slate-300 hover:text-white transition flex items-center space-x-1.5">
+          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          <span>GitHub</span>
+        </a>
+        <a href="https://github.com/itzabhishekgour/HostTriangle/releases/download/v0.1.0-beta.1/HostTriangle-v0.1.0-beta.1-release.apk" target="_blank" rel="noopener noreferrer" class="inline-flex items-center space-x-2 px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow-lg shadow-emerald-500/20 transition transform active:scale-95">
+          <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+          <span>Download APK</span>
+        </a>
+      </div>
+
+      <!-- Mobile Hamburger Toggle -->
+      <button id="mobileMenuBtn" aria-label="Toggle Navigation" class="md:hidden p-2 rounded-lg text-slate-400 hover:text-white hover:bg-brand-850 focus:outline-none">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/></svg>
+      </button>
+    </div>
+
+    <!-- Mobile Drawer -->
+    <div id="mobileMenu" class="hidden md:hidden px-4 pt-2 pb-4 space-y-2 bg-brand-900 border-b border-brand-border">
+      <a href="#why" class="block px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-brand-800" onclick="toggleMobileMenu()">Why HostTriangle</a>
+      <a href="#architecture" class="block px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-brand-800" onclick="toggleMobileMenu()">Architecture</a>
+      <a href="#comparison" class="block px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-brand-800" onclick="toggleMobileMenu()">Comparison</a>
+      <a href="#screenshots" class="block px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-brand-800" onclick="toggleMobileMenu()">Screenshots</a>
+      <a href="#privacy" class="block px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-brand-800" onclick="toggleMobileMenu()">Local Privacy</a>
+      <a href="#faq" class="block px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-brand-800" onclick="toggleMobileMenu()">FAQ</a>
+      <div class="pt-2 border-t border-brand-border flex gap-2">
+        <a href="https://github.com/itzabhishekgour/HostTriangle/releases/download/v0.1.0-beta.1/HostTriangle-v0.1.0-beta.1-release.apk" target="_blank" rel="noopener noreferrer" class="flex-1 text-center py-2 rounded-lg bg-emerald-500 text-slate-950 font-bold text-xs">
+          Download APK
+        </a>
+        <a href="https://github.com/itzabhishekgour/HostTriangle" target="_blank" rel="noopener noreferrer" class="px-4 py-2 rounded-lg border border-brand-border text-center text-xs font-semibold text-slate-300">
+          GitHub
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= HERO SECTION ================= -->
+  <section class="relative pt-8 pb-16 sm:pt-16 sm:pb-24 md:pt-24 md:pb-32 overflow-hidden bg-grid-pattern">
+    <!-- Ambient Background Gradients -->
+    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-emerald-500/10 blur-[150px] rounded-full pointer-events-none"></div>
+    <div class="absolute top-1/3 left-1/4 -translate-x-1/2 w-[450px] h-[250px] bg-cyan-500/10 blur-[130px] rounded-full pointer-events-none"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div class="text-center max-w-4xl mx-auto">
+        <!-- HostTriangle Brand Text in Hero -->
+        <div class="flex items-center justify-center mb-4 sm:mb-5">
+          <img src="assets/hosttriangle_text.png" alt="HostTriangle" class="h-8 sm:h-14 md:h-18 lg:h-20 w-auto object-contain filter drop-shadow-[0_0_30px_rgba(6,182,212,0.45)] hover:scale-105 transition duration-300" />
+        </div>
+
+        <!-- Badge -->
+        <div class="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1 sm:px-4 sm:py-1.5 rounded-full bg-brand-850/90 border border-brand-border text-[11px] sm:text-xs font-medium text-slate-300 mb-5 sm:mb-6 shadow-sm backdrop-blur-md">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
+          <span class="text-emerald-400 font-semibold whitespace-nowrap">Free & Open Source</span>
+          <span class="text-slate-500">•</span>
+          <span class="whitespace-nowrap">Android 8.0+</span>
+          <span class="text-slate-500">•</span>
+          <span class="whitespace-nowrap">ARM64</span>
+        </div>
+
+        <!-- Headline -->
+        <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.2] sm:leading-[1.15]">
+          Turn Spare Android Devices Into <br class="hidden sm:inline" />
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 sm:whitespace-nowrap">
+            Always-On Edge Compute Nodes
+          </span>
+        </h1>
+
+        <!-- Subheadline -->
+        <p class="mt-4 sm:mt-6 text-sm sm:text-base md:text-lg text-slate-300 leading-relaxed max-w-2xl mx-auto font-normal">
+          Run your Java (Spring Boot), Node.js, and Python microservices directly on spare Android hardware. Avoid cloud inactivity spin-downs, skip router port-forwarding with Cloudflare Tunnels, and keep your code and secrets on your device.
+        </p>
+
+        <!-- CTA Action Buttons -->
+        <div class="mt-7 sm:mt-9 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
+          <a href="https://github.com/itzabhishekgour/HostTriangle/releases/download/v0.1.0-beta.1/HostTriangle-v0.1.0-beta.1-release.apk" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto inline-flex items-center justify-center space-x-2.5 px-6 py-3.5 sm:px-7 sm:py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm shadow-xl shadow-emerald-500/25 transition transform active:scale-95">
+            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+            <span>Download Official APK</span>
+            <span class="px-1.5 py-0.5 text-[10px] bg-slate-950 text-emerald-400 rounded font-mono">v0.1.0-beta.1</span>
+          </a>
+          <a href="https://github.com/itzabhishekgour/HostTriangle" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-6 py-3.5 rounded-xl bg-brand-850 hover:bg-brand-800 border border-brand-border text-white font-medium text-sm transition">
+            <svg class="w-5 h-5 fill-current text-slate-400" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+            <span>GitHub Repository</span>
+          </a>
+        </div>
+
+        <!-- Trust Telemetry Pills (2x2 Grid on Mobile, Flex on sm+) -->
+        <div class="mt-6 sm:mt-8 grid grid-cols-2 sm:flex sm:flex-wrap items-center justify-center gap-x-3 gap-y-2.5 sm:gap-6 text-[11px] sm:text-xs text-slate-400 font-mono max-w-sm sm:max-w-none mx-auto text-left sm:text-center px-1">
+          <div class="inline-flex items-center space-x-1.5">
+            <svg class="w-3.5 h-3.5 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            <span class="truncate">On-Device Privacy</span>
+          </div>
+          <div class="inline-flex items-center space-x-1.5">
+            <svg class="w-3.5 h-3.5 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            <span class="truncate">Rootless PRoot v5.1</span>
+          </div>
+          <div class="inline-flex items-center space-x-1.5">
+            <svg class="w-3.5 h-3.5 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            <span class="truncate">16 KB Page-Size PTY</span>
+          </div>
+          <div class="inline-flex items-center space-x-1.5">
+            <svg class="w-3.5 h-3.5 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            <span class="truncate">GNU GPL-3.0-only</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= INTERACTIVE TERMINAL SIMULATOR ================= -->
+      <div class="mt-14 max-w-4xl mx-auto">
+        <div class="p-2 sm:p-3 rounded-2xl bg-gradient-to-b from-brand-border/80 via-brand-900 to-brand-950 border border-brand-border shadow-2xl glow-emerald">
+          <div class="rounded-xl overflow-hidden bg-brand-950 border border-brand-border/60">
+            <!-- Window Titlebar with Clickable Tabs -->
+            <div class="px-4 py-2.5 bg-brand-900/90 border-b border-brand-border/60 flex flex-wrap items-center justify-between gap-3">
+              <div class="flex items-center space-x-2">
+                <span class="w-3 h-3 rounded-full bg-rose-500/80 inline-block"></span>
+                <span class="w-3 h-3 rounded-full bg-amber-500/80 inline-block"></span>
+                <span class="w-3 h-3 rounded-full bg-emerald-500/80 inline-block"></span>
+                <span class="ml-2 text-xs font-mono font-medium text-slate-400">hosttriangle-node-01 [arm64]</span>
+              </div>
+
+              <!-- Simulator Tabs -->
+              <div class="flex items-center space-x-1 bg-brand-950 p-1 rounded-lg border border-brand-border/60 text-xs font-mono">
+                <button onclick="switchTab('spring')" id="tab-spring" class="px-2.5 py-1 rounded bg-brand-800 text-emerald-400 font-semibold transition">
+                  Spring Boot JVM
+                </button>
+                <button onclick="switchTab('ingress')" id="tab-ingress" class="px-2.5 py-1 rounded text-slate-400 hover:text-white transition">
+                  Cloudflare Ingress
+                </button>
+                <button onclick="switchTab('vitals')" id="tab-vitals" class="px-2.5 py-1 rounded text-slate-400 hover:text-white transition">
+                  Hardware Vitals
+                </button>
+              </div>
+            </div>
+
+            <!-- Terminal Code Window -->
+            <div class="p-4 sm:p-6 font-mono text-xs sm:text-sm leading-relaxed overflow-x-auto min-h-[260px]">
+              <!-- View 1: Spring Boot -->
+              <div id="view-spring" class="space-y-1.5 text-slate-300">
+                <div class="text-slate-500">// PRoot Execution Engine inside /srv/app</div>
+                <div class="text-emerald-400 font-bold">$ /usr/lib/jvm/temurin-21-jre/bin/java -Xms128m -Xmx512m -jar backend.jar</div>
+                <div class="text-slate-400">  .   ____          _            __ _ _</div>
+                <div class="text-slate-400"> /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \</div>
+                <div class="text-slate-400">( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \</div>
+                <div class="text-slate-400"> \\/  ___)| |_)| | | | | || (_| |  ) ) ) )</div>
+                <div class="text-slate-400">  '  |____| .__|_| |_|_| |_\__, | / / / /</div>
+                <div class="text-slate-400"> =========|_|==============|___/=/_/_/_/</div>
+                <div class="text-cyan-400">[HostTriangleEngine] Starting Spring Boot application on aarch64 Android kernel...</div>
+                <div class="text-slate-300">[INFO] Tomcat initialized with port 8080 (http)</div>
+                <div class="text-emerald-400 font-semibold">[SUCCESS] Started Application in 2.381 seconds (JVM running for 2.912)</div>
+                <div class="text-emerald-300">[STATUS] Health probe 200 OK • Ingress stream ready on 127.0.0.1:8080</div>
+              </div>
+
+              <!-- View 2: Cloudflare Ingress -->
+              <div id="view-ingress" class="hidden space-y-1.5 text-slate-300">
+                <div class="text-slate-500">// Native cloudflared aarch64 daemon</div>
+                <div class="text-blue-400 font-bold">$ libcloudflared.so tunnel run --token eyJhbGciOi...</div>
+                <div class="text-slate-400">[INFO] Tunnel ID: e42f9810-7b51-4c62-8e39-1f062ab903de</div>
+                <div class="text-slate-400">[INFO] Established outbound connection to Cloudflare edge edge-hyd-01.cloudflare.com</div>
+                <div class="text-slate-400">[INFO] TLS 1.3 Handshake completed. Anycast ingress active across 310+ cities.</div>
+                <div class="text-emerald-400 font-semibold">[INGRESS READY] https://api.yourdomain.com -> 127.0.0.1:8080</div>
+                <div class="text-cyan-300">[ROUTE] HTTP/2 GET /v1/products 200 OK (Roundtrip: 14ms)</div>
+                <div class="text-slate-500">[SECURITY] Outbound-only tunnel. No router port-forwarding or public IP required.</div>
+              </div>
+
+              <!-- View 3: Hardware Vitals -->
+              <div id="view-vitals" class="hidden space-y-1.5 text-slate-300">
+                <div class="text-slate-500">// Device Thermal & Battery Telemetry</div>
+                <div class="text-purple-400 font-bold">$ hosttriangle-telemetry-daemon --realtime</div>
+                <div class="text-slate-300">CPU Architecture  : ARM64-v8a (8 Cores: 4x 2.4GHz + 4x 1.8GHz)</div>
+                <div class="text-slate-300">Page Alignment    : 16 KB Aligned (Modern Android 15+ compatible)</div>
+                <div class="text-emerald-400">Battery Level     : 82% (AC Connected, Bypass charging active)</div>
+                <div class="text-emerald-400">Battery Temp      : 31.4°C [HEALTHY / LOW THERMAL WEAR]</div>
+                <div class="text-cyan-400">Memory Utilization: 342 MB / 5.8 GB (6% used by PRoot + JVM)</div>
+                <div class="text-slate-400">Idle Draw         : ~1.8 Watts (Significantly greener than a 65W Desktop)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= THE WHY / STORY SECTION ================= -->
+  <section id="why" class="py-18 bg-brand-900/40 border-y border-brand-border">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center space-y-3 mb-10">
+        <span class="text-xs font-mono font-semibold uppercase tracking-wider text-emerald-400">The Problem & The Vision</span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Why I Created HostTriangle</h2>
+      </div>
+
+      <div class="p-6 sm:p-10 rounded-2xl bg-brand-850 border border-brand-border space-y-5 text-slate-300 text-base leading-relaxed shadow-xl">
+        <p>
+          Deploying modern frontend applications (React, Next.js, Flutter) has become completely free and instantaneous on services like Vercel and Cloudflare Pages. But backend hosting remains broken: free cloud tiers shut down instances after 15 minutes of inactivity, inflicting brutal <strong class="text-white">30 to 50-second cold starts</strong> on students and indie developers showcasing their work.
+        </p>
+        <p>
+          Keeping a desktop PC or server running 24/7 consumes 60W–150W of power, requires continuous fan noise, and fails during local power cuts without a heavy UPS.
+        </p>
+        <p>
+          Then the realization struck: <strong class="text-emerald-400 font-semibold">our spare Android phones are already quiet, power-efficient, battery-backed supercomputers.</strong> An older phone with an 8-core ARM64 CPU and 6 GB RAM has more raw compute capacity than many standard cloud VPS tiers—drawing less than 2 Watts of electricity.
+        </p>
+        <p>
+          <strong class="text-white">HostTriangle turns this hardware into an edge compute node.</strong> By running an isolated Debian sandbox on Android and exposing your port via an outbound Cloudflare Zero Trust Tunnel, your spare phone serves as a practical, always-on hosting node for your APIs.
+        </p>
+
+        <!-- Two Core Design Principles -->
+        <div class="grid sm:grid-cols-2 gap-4 pt-4 border-t border-brand-border">
+          <div class="p-4 rounded-xl bg-brand-900 border border-brand-border">
+            <h4 class="font-bold text-white text-sm mb-1 flex items-center space-x-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+              <span>Stateless Compute Principle</span>
+            </h4>
+            <p class="text-xs text-slate-400 leading-relaxed">Keep your database on free managed tiers (Supabase, Neon, MongoDB Atlas), while stateless compute logic runs directly across your devices.</p>
+          </div>
+          <div class="p-4 rounded-xl bg-brand-900 border border-brand-border">
+            <h4 class="font-bold text-white text-sm mb-1 flex items-center space-x-1.5">
+              <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+              <span>Zero Maintenance Failover</span>
+            </h4>
+            <p class="text-xs text-slate-400 leading-relaxed">If one node temporarily loses power or reboots, Cloudflare Load Balancing automatically routes traffic to another phone in your cluster.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= ARCHITECTURE SECTION ================= -->
+  <section id="architecture" class="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center space-y-3 mb-14">
+      <span class="text-xs font-mono font-semibold uppercase tracking-wider text-emerald-400">Under The Hood</span>
+      <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Engineered for Production Grade Stability</h2>
+      <p class="text-slate-400 text-sm max-w-xl mx-auto">No hacks, no fragile rooting, and no kernel modifications. Built on standard POSIX virtualization.</p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-6">
+      <!-- Arch Card 1 -->
+      <div class="p-6 rounded-2xl bg-brand-850 border border-brand-border hover:border-emerald-500/50 transition-all duration-300 hover:-translate-y-1">
+        <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-mono font-bold text-lg mb-5">
+          01
+        </div>
+        <h3 class="text-lg font-bold text-white mb-2">PRoot v5.1 Userland</h3>
+        <p class="text-sm text-slate-400 leading-relaxed">
+          Uses <code class="text-xs font-mono text-emerald-300">ptrace</code> system call interception to provide a rootless chroot environment. The application runs with standard Android UID permissions while believing it has root inside Debian.
+        </p>
+      </div>
+
+      <!-- Arch Card 2 -->
+      <div class="p-6 rounded-2xl bg-brand-850 border border-brand-border hover:border-cyan-500/50 transition-all duration-300 hover:-translate-y-1">
+        <div class="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 font-mono font-bold text-lg mb-5">
+          02
+        </div>
+        <h3 class="text-lg font-bold text-white mb-2">16 KB Page-Size Native PTY</h3>
+        <p class="text-sm text-slate-400 leading-relaxed">
+          Compiled with clean-room C code and linked with <code class="text-xs font-mono text-cyan-300">-Wl,-z,max-page-size=16384</code>. Guarantees 100% compatibility with Android 15 and future Linux kernel architectures.
+        </p>
+      </div>
+
+      <!-- Arch Card 3 -->
+      <div class="p-6 rounded-2xl bg-brand-850 border border-brand-border hover:border-purple-500/50 transition-all duration-300 hover:-translate-y-1">
+        <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 font-mono font-bold text-lg mb-5">
+          03
+        </div>
+        <h3 class="text-lg font-bold text-white mb-2">Cloudflare Zero Trust Ingress</h3>
+        <p class="text-sm text-slate-400 leading-relaxed">
+          The embedded <code class="text-xs font-mono text-purple-300">cloudflared</code> daemon establishes encrypted outbound TLS tunnels. Seamlessly punches through carrier CGNAT, home Wi-Fi routers, and mobile firewalls.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= COMPARISON MATRIX TABLE ================= -->
+  <section id="comparison" class="py-20 bg-brand-900/30 border-y border-brand-border">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center space-y-3 mb-12">
+        <span class="text-xs font-mono font-semibold uppercase tracking-wider text-emerald-400">Architectural Trade-Offs</span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Honest Architectural Comparison</h2>
+        <p class="text-slate-400 text-sm max-w-2xl mx-auto">
+          An honest, realistic look at how hosting on spare phone hardware compares against free cloud tiers and dedicated single-board computers.
+        </p>
+      </div>
+
+      <!-- Comparison Table Card -->
+      <div class="overflow-x-auto rounded-2xl border border-brand-border bg-brand-850 shadow-2xl">
+        <table class="w-full text-left border-collapse text-xs sm:text-sm">
+          <thead>
+            <tr class="border-b border-brand-border bg-brand-900/80 text-slate-300 font-semibold font-mono">
+              <th class="p-4 sm:p-5 w-1/4">Aspect / Feature</th>
+              <th class="p-4 sm:p-5 w-1/4 text-emerald-400 bg-emerald-500/5">HostTriangle (Phone)</th>
+              <th class="p-4 sm:p-5 w-1/4 text-slate-300">Free Cloud Tiers (Render, etc.)</th>
+              <th class="p-4 sm:p-5 w-1/4 text-slate-300">Dedicated Raspberry Pi</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-brand-border text-slate-300 font-normal">
+            <tr class="hover:bg-brand-800/40 transition">
+              <td class="p-4 sm:p-5 font-semibold text-white">Hardware Needed</td>
+              <td class="p-4 sm:p-5 text-emerald-400 font-semibold bg-emerald-500/5">Spare phone you already have</td>
+              <td class="p-4 sm:p-5 text-slate-400">None (remote cloud platform)</td>
+              <td class="p-4 sm:p-5 text-slate-400">Purchase board, microSD, PSU, case ($60–$100+)</td>
+            </tr>
+            <tr class="hover:bg-brand-800/40 transition">
+              <td class="p-4 sm:p-5 font-semibold text-white">Running Cost</td>
+              <td class="p-4 sm:p-5 text-emerald-400 font-semibold bg-emerald-500/5">Low electricity + existing Wi-Fi or data</td>
+              <td class="p-4 sm:p-5 text-slate-400">$0 within free tier limits (e.g. Render free plan, Railway credits)</td>
+              <td class="p-4 sm:p-5 text-slate-400">Low electricity</td>
+            </tr>
+            <tr class="hover:bg-brand-800/40 transition">
+              <td class="p-4 sm:p-5 font-semibold text-white">Inactivity Spin-down</td>
+              <td class="p-4 sm:p-5 text-emerald-400 font-semibold bg-emerald-500/5">No spin-down (as long as phone is active and service is alive)</td>
+              <td class="p-4 sm:p-5 text-amber-300">Often spins down after 15m inactivity (e.g. Render free tier takes ~50s to spin up)</td>
+              <td class="p-4 sm:p-5 text-slate-400">No spin-down</td>
+            </tr>
+            <tr class="hover:bg-brand-800/40 transition">
+              <td class="p-4 sm:p-5 font-semibold text-white">Uptime & Reliability</td>
+              <td class="p-4 sm:p-5 text-slate-300 bg-emerald-500/5">Depends on phone battery, thermal limits, and Android Doze/battery settings</td>
+              <td class="p-4 sm:p-5 text-slate-400">Governed by platform uptime SLAs and monthly free compute caps</td>
+              <td class="p-4 sm:p-5 text-slate-400">Depends on home power and external UPS setup</td>
+            </tr>
+            <tr class="hover:bg-brand-800/40 transition">
+              <td class="p-4 sm:p-5 font-semibold text-white">Code & Secrets Privacy</td>
+              <td class="p-4 sm:p-5 text-emerald-400 font-semibold bg-emerald-500/5">Source code, JAR binaries, and .env secrets stay physically on your device</td>
+              <td class="p-4 sm:p-5 text-amber-300">Code and environment variables stored on third-party cloud infrastructure</td>
+              <td class="p-4 sm:p-5 text-slate-400">Code and secrets stay physically on your device</td>
+            </tr>
+            <tr class="hover:bg-brand-800/40 transition">
+              <td class="p-4 sm:p-5 font-semibold text-white">Public URL & Ingress</td>
+              <td class="p-4 sm:p-5 text-slate-300 bg-emerald-500/5">Cloudflare Tunnel (traffic proxies through Cloudflare edge network)</td>
+              <td class="p-4 sm:p-5 text-slate-400">Platform-provided HTTPS endpoint or subdomain</td>
+              <td class="p-4 sm:p-5 text-slate-400">Cloudflare Tunnel or router port-forwarding / Dynamic DNS</td>
+            </tr>
+            <tr class="hover:bg-brand-800/40 transition">
+              <td class="p-4 sm:p-5 font-semibold text-white">Best Suited For</td>
+              <td class="p-4 sm:p-5 text-emerald-400 font-semibold bg-emerald-500/5">College, test, and portfolio projects without a credit card</td>
+              <td class="p-4 sm:p-5 text-slate-400">Quick cloud deployments and serverless testing</td>
+              <td class="p-4 sm:p-5 text-slate-400">Dedicated always-on home server / self-hosted home lab</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Trade-Off Notice & Verified Sources -->
+      <div class="mt-5 p-4 rounded-xl bg-brand-850 border border-brand-border text-xs text-slate-400 space-y-2">
+        <p class="font-medium text-slate-300">
+          <strong class="text-amber-400 font-semibold">Important Architecture Note:</strong> Not intended for production or mission-critical use. Reliability depends on your phone's battery health, thermal limits, and Android background battery optimization settings.
+        </p>
+        <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-slate-400 pt-2 border-t border-brand-border/60">
+          <span>Free tier cloud details verified from official documentation (as of November 2026):</span>
+          <a href="https://render.com/docs/free" target="_blank" rel="noopener noreferrer" class="text-emerald-400 hover:underline">Render: Deploy for Free</a>
+          <span class="text-slate-600">•</span>
+          <a href="https://docs.railway.com/pricing/free-plan" target="_blank" rel="noopener noreferrer" class="text-emerald-400 hover:underline">Railway: Free Plan</a>
+          <span class="text-slate-600">•</span>
+          <a href="https://docs.railway.com/pricing/free-trial" target="_blank" rel="noopener noreferrer" class="text-emerald-400 hover:underline">Railway: Free Trial</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= POLYGLOT RUNTIME STACK ================= -->
+  <section class="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center space-y-3 mb-14">
+      <span class="text-xs font-mono font-semibold uppercase tracking-wider text-emerald-400">Polyglot Compute</span>
+      <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Run Your Backend on Your Own Phone</h2>
+      <p class="text-slate-400 text-sm max-w-xl mx-auto">HostTriangle bundles a Debian environment with on-demand runtimes.</p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+      <!-- Tested: Java -->
+      <div class="p-6 sm:p-7 rounded-2xl bg-brand-850 border border-emerald-500/40 relative space-y-3 shadow-lg">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <span class="text-2xl">☕</span>
+            <h3 class="text-lg font-bold text-white">Java (Spring Boot, JAR)</h3>
+          </div>
+          <span class="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+            TESTED
+          </span>
+        </div>
+        <p class="text-sm text-slate-300 leading-relaxed">
+          Eclipse Temurin headless runtimes. HostTriangle reads your JAR's bytecode version and tells you if it needs a newer runtime.
+        </p>
+        <div class="text-xs font-mono text-emerald-400 pt-1">
+          Supports: Java 8, 11, 17, 21 LTS (Temurin JRE)
+        </div>
+      </div>
+
+      <!-- Experimental: Node.js, Python, ARM64 -->
+      <div class="p-6 sm:p-7 rounded-2xl bg-brand-850 border border-brand-border hover:border-slate-700 relative space-y-3 shadow-lg">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <span class="text-2xl">🧪</span>
+            <h3 class="text-lg font-bold text-white">Node.js, Python, ARM64</h3>
+          </div>
+          <span class="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/30">
+            EXPERIMENTAL
+          </span>
+        </div>
+        <p class="text-sm text-slate-300 leading-relaxed">
+          Auto-detected and launched from your workspace. Not yet tested across common frameworks.
+        </p>
+        <div class="text-xs font-mono text-slate-400 pt-1">
+          Framework test suite in progress
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PRIVACY & DATA FLOW ================= -->
+  <section id="privacy" class="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="p-8 sm:p-12 rounded-3xl bg-brand-850 border border-brand-border space-y-6 shadow-xl">
+      <div class="max-w-3xl space-y-3">
+        <span class="inline-block px-3 py-1 rounded-full bg-slate-800 text-slate-300 text-xs font-mono font-semibold">
+          PRIVACY & DATA FLOW
+        </span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+          Clear, Transparent Data Handling
+        </h2>
+        <div class="space-y-4 text-slate-300 text-sm sm:text-base leading-relaxed pt-2">
+          <p>
+            Your source code and <code class="px-1.5 py-0.5 rounded bg-brand-950 text-emerald-400 font-mono text-xs">.env</code> files are stored in the app's private storage on your phone. They are not uploaded to a HostTriangle server, because HostTriangle has no server.
+          </p>
+          <p>
+            Public requests travel through Cloudflare's network, and Cloudflare can see that traffic (TLS terminates at Cloudflare edge before reaching your tunnel). If you connect a cloud database (such as Supabase or Neon), your data lives there.
+          </p>
+          <p>
+            HostTriangle itself includes no analytics or crash reporting. The bundled <code class="px-1.5 py-0.5 rounded bg-brand-950 text-slate-200 font-mono text-xs">cloudflared</code> daemon connects to Cloudflare to run your tunnel.
+          </p>
+        </div>
+      </div>
+
+      <div class="mt-8 grid sm:grid-cols-2 gap-4 pt-6 border-t border-brand-border/60">
+        <div class="p-4 rounded-xl bg-brand-900 border border-brand-border space-y-1.5">
+          <div class="text-sm font-bold text-white">No HostTriangle Telemetry</div>
+          <div class="text-xs text-slate-400 leading-relaxed">
+            HostTriangle includes zero analytics, tracking, or crash reporters. Verified with zero tracking SDKs in the dependency tree.
+          </div>
+        </div>
+        <div class="p-4 rounded-xl bg-brand-900 border border-brand-border space-y-1.5">
+          <div class="text-sm font-bold text-white">Open Source Licensing</div>
+          <div class="text-xs text-slate-400 leading-relaxed">
+            HostTriangle's own code is GPL-3.0-only. Bundled components keep their own licenses. See <a href="https://github.com/itzabhishekgour/HostTriangle/blob/alpha/THIRD_PARTY_NOTICES.md" target="_blank" rel="noopener noreferrer" class="text-emerald-400 hover:underline">THIRD_PARTY_NOTICES.md</a>.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SCREENSHOTS SHOWCASE (ALL 6 SANITIZED) ================= -->
+  <section id="screenshots" class="py-20 bg-brand-900/30 border-y border-brand-border">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center space-y-3 mb-14">
+        <span class="text-xs font-mono font-semibold uppercase tracking-wider text-emerald-400">Application Showcase</span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Refined Native Android Interface</h2>
+        <p class="text-sm text-slate-400">Designed with Material 3 & Jetpack Compose. Click any image to view high-resolution zoom.</p>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <!-- Screen 1: Hero Dashboard -->
+        <div class="space-y-2 cursor-pointer group" onclick="openLightbox('assets/01_dashboard_hero.png', 'Executive Dashboard: Live Ingress & Service Telemetry')">
+          <div class="rounded-xl overflow-hidden border border-brand-border bg-brand-950 shadow-lg group-hover:border-emerald-500 transition duration-300">
+            <img src="assets/01_dashboard_hero.png" alt="Dashboard Status" class="w-full h-auto group-hover:scale-105 transition duration-300" />
+          </div>
+          <div class="text-center">
+            <div class="text-xs font-bold text-white">Dashboard</div>
+            <div class="text-[11px] text-slate-400">Live Status & Ingress</div>
+          </div>
+        </div>
+
+        <!-- Screen 2: Hardware Vitals -->
+        <div class="space-y-2 cursor-pointer group" onclick="openLightbox('assets/02_dashboard_vitals.png', 'Hardware Vitals: Real-Time Battery & Thermal Telemetry')">
+          <div class="rounded-xl overflow-hidden border border-brand-border bg-brand-950 shadow-lg group-hover:border-emerald-500 transition duration-300">
+            <img src="assets/02_dashboard_vitals.png" alt="Hardware Vitals" class="w-full h-auto group-hover:scale-105 transition duration-300" />
+          </div>
+          <div class="text-center">
+            <div class="text-xs font-bold text-white">Vitals</div>
+            <div class="text-[11px] text-slate-400">Battery & Thermals</div>
+          </div>
+        </div>
+
+        <!-- Screen 3: Deployment Artifacts -->
+        <div class="space-y-2 cursor-pointer group" onclick="openLightbox('assets/03_deployment_artifacts.png', 'Deployment Artifacts: Automated JAR Bytecode Analyzer')">
+          <div class="rounded-xl overflow-hidden border border-brand-border bg-brand-950 shadow-lg group-hover:border-emerald-500 transition duration-300">
+            <img src="assets/03_deployment_artifacts.png" alt="Deployment Artifacts" class="w-full h-auto group-hover:scale-105 transition duration-300" />
+          </div>
+          <div class="text-center">
+            <div class="text-xs font-bold text-white">Deployment</div>
+            <div class="text-[11px] text-slate-400">Bytecode Analyzer</div>
+          </div>
+        </div>
+
+        <!-- Screen 4: Runtime Configuration -->
+        <div class="space-y-2 cursor-pointer group" onclick="openLightbox('assets/04_deployment_runtime.png', 'Runtime Configuration: Port Ingress & Environment Variables')">
+          <div class="rounded-xl overflow-hidden border border-brand-border bg-brand-950 shadow-lg group-hover:border-emerald-500 transition duration-300">
+            <img src="assets/04_deployment_runtime.png" alt="Runtime Configuration" class="w-full h-auto group-hover:scale-105 transition duration-300" />
+          </div>
+          <div class="text-center">
+            <div class="text-xs font-bold text-white">Runtime</div>
+            <div class="text-[11px] text-slate-400">Secrets & Port Config</div>
+          </div>
+        </div>
+
+        <!-- Screen 5: Live Terminal Logs -->
+        <div class="space-y-2 cursor-pointer group" onclick="openLightbox('assets/05_terminal_logs.png', 'Terminal: Live Rootless Linux PRoot PTY Logs')">
+          <div class="rounded-xl overflow-hidden border border-brand-border bg-brand-950 shadow-lg group-hover:border-emerald-500 transition duration-300">
+            <img src="assets/05_terminal_logs.png" alt="Terminal Logs" class="w-full h-auto group-hover:scale-105 transition duration-300" />
+          </div>
+          <div class="text-center">
+            <div class="text-xs font-bold text-white">Terminal</div>
+            <div class="text-[11px] text-slate-400">Live PRoot Logs</div>
+          </div>
+        </div>
+
+        <!-- Screen 6: Fleet Topology -->
+        <div class="space-y-2 cursor-pointer group" onclick="openLightbox('assets/06_fleet_topology.png', 'Fleet Topology: Multi-Device Cluster & Health Checks')">
+          <div class="rounded-xl overflow-hidden border border-brand-border bg-brand-950 shadow-lg group-hover:border-emerald-500 transition duration-300">
+            <img src="assets/06_fleet_topology.png" alt="Fleet Topology" class="w-full h-auto group-hover:scale-105 transition duration-300" />
+          </div>
+          <div class="text-center">
+            <div class="text-xs font-bold text-white">Fleet Map</div>
+            <div class="text-[11px] text-slate-400">Multi-Node Cluster</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= HOW IT WORKS / QUICK START (TRIANGLE FLOW) ================= -->
+  <section id="how-it-works" class="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div class="text-center space-y-3 mb-12 sm:mb-16">
+      <span class="text-xs font-mono font-semibold uppercase tracking-wider text-emerald-400">Quick Start</span>
+      <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Deploy In 3 Simple Steps</h2>
+      <p class="text-slate-400 text-sm max-w-xl mx-auto">Deploy your backend directly on Android hardware with secure Cloudflare Zero Trust ingress.</p>
+    </div>
+
+    <!-- Triangle Canvas / Responsive Container -->
+    <div class="relative w-full max-w-4xl mx-auto sm:h-[580px] md:h-[600px] flex flex-col sm:block gap-3 sm:gap-0">
+
+      <!-- ================= SVG CONNECTOR EDGES (Desktop & Tablet) ================= -->
+      <svg class="hidden sm:block absolute inset-0 w-full h-full pointer-events-none z-0" viewBox="0 0 900 600" fill="none" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <!-- Gradient: Top -> Bottom-Left (1 -> 2) -->
+          <linearGradient id="edge12" gradientUnits="userSpaceOnUse" x1="400" y1="160" x2="255" y2="435">
+            <stop offset="0%" stop-color="#10B981" />
+            <stop offset="100%" stop-color="#06B6D4" />
+          </linearGradient>
+          <!-- Gradient: Bottom-Left -> Bottom-Right (2 -> 3) -->
+          <linearGradient id="edge23" gradientUnits="userSpaceOnUse" x1="330" y1="515" x2="570" y2="515">
+            <stop offset="0%" stop-color="#06B6D4" />
+            <stop offset="100%" stop-color="#10B981" />
+          </linearGradient>
+          <!-- Gradient: Bottom-Right -> Top (3 -> 1) -->
+          <linearGradient id="edge31" gradientUnits="userSpaceOnUse" x1="645" y1="435" x2="500" y2="160">
+            <stop offset="0%" stop-color="#10B981" />
+            <stop offset="100%" stop-color="#06B6D4" />
+          </linearGradient>
+
+          <!-- Arrow Marker: Emerald -->
+          <marker id="arrow-emerald" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#10B981" />
+          </marker>
+          <!-- Arrow Marker: Cyan -->
+          <marker id="arrow-cyan" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#06B6D4" />
+          </marker>
+        </defs>
+
+        <style>
+          @keyframes trianglePulse {
+            0%, 100% { stroke-dashoffset: 0; opacity: 0.85; }
+            50% { stroke-dashoffset: -28; opacity: 1; }
+          }
+          .triangle-edge {
+            stroke-dasharray: 8 6;
+            animation: trianglePulse 6s linear infinite;
+          }
+        </style>
+
+        <!-- Edge 1 -> 2: From Step 1 (Top) to Step 2 (Bottom-Left) -->
+        <path d="M 395 170 L 265 415" stroke="url(#edge12)" stroke-width="2.5" class="triangle-edge" marker-end="url(#arrow-cyan)" />
+
+        <!-- Edge 2 -> 3: From Step 2 (Bottom-Left) to Step 3 (Bottom-Right) -->
+        <path d="M 355 515 L 525 515" stroke="url(#edge23)" stroke-width="2.5" class="triangle-edge" marker-end="url(#arrow-emerald)" />
+
+        <!-- Edge 3 -> 1: From Step 3 (Bottom-Right) back to Step 1 (Top Ingress Loop) -->
+        <path d="M 640 415 L 505 170" stroke="url(#edge31)" stroke-width="2.5" class="triangle-edge" marker-end="url(#arrow-cyan)" />
+      </svg>
+
+      <!-- ================= CENTER EMBLEM / HOSTTRIANGLE NODE ================= -->
+      <div class="hidden sm:flex absolute top-[47%] md:top-[49%] left-1/2 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center z-10 pointer-events-none" aria-hidden="true">
+        <div class="relative w-24 h-24 md:w-28 md:h-28 rounded-full bg-gradient-to-br from-cyan-950/70 via-brand-850 to-emerald-950/60 border border-cyan-500/30 shadow-[0_0_45px_rgba(6,182,212,0.22)] flex items-center justify-center p-3 backdrop-blur-md">
+          <!-- Subtle rotating dash ring -->
+          <div class="absolute inset-0 rounded-full border border-dashed border-emerald-400/25 animate-spin" style="animation-duration: 35s;"></div>
+          <!-- Center Icon -->
+          <img src="assets/hosttriangle_icon.png" alt="" class="w-14 h-14 md:w-16 md:h-16 object-contain drop-shadow-[0_0_14px_rgba(16,185,129,0.55)]" />
+        </div>
+        <div class="mt-2.5 text-center">
+          <span class="text-[11px] font-mono font-bold tracking-widest uppercase text-emerald-400 block">HostTriangle Node</span>
+          <span class="text-[10px] text-slate-400 font-mono block">Rootless PRoot Engine</span>
+        </div>
+      </div>
+
+      <!-- ================= RETURN EDGE LABEL (3 -> 1): Public HTTPS URL ================= -->
+      <div class="hidden sm:inline-flex absolute z-20 items-center gap-1.5 px-3 py-1.5 rounded-full bg-brand-900/95 border border-cyan-500/50 text-cyan-300 text-xs font-mono shadow-xl shadow-cyan-950/60 backdrop-blur-md hover:border-cyan-400 transition" style="left: 69%; top: 43%; transform: translate(-50%, -50%);">
+        <svg class="w-3.5 h-3.5 text-cyan-400 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        <span class="font-semibold tracking-wide">Public HTTPS URL</span>
+      </div>
+
+      <!-- ================= STEP 1: Top Vertex ================= -->
+      <div class="sm:absolute sm:top-0 sm:left-1/2 sm:-translate-x-1/2 w-full sm:w-[280px] md:w-[310px] lg:w-[340px] z-20 group">
+        <div class="p-5 sm:p-6 rounded-2xl bg-brand-850 border border-brand-border hover:border-emerald-500/60 transition-all duration-300 shadow-xl backdrop-blur-md relative overflow-hidden group-hover:shadow-emerald-500/10">
+          <div class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-emerald-500 to-transparent"></div>
+          <div class="flex items-center gap-3.5 mb-3">
+            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 text-slate-950 font-extrabold text-sm sm:text-base flex items-center justify-center shadow-lg shadow-emerald-500/25 ring-2 ring-emerald-400/30 shrink-0">
+              1
+            </div>
+            <div>
+              <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-400">Step 01</span>
+              <h3 class="text-base font-bold text-white group-hover:text-emerald-300 transition-colors">Select Your Artifact</h3>
+            </div>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            Open Deployment, choose your Spring Boot <code class="text-xs font-mono text-emerald-300 bg-emerald-950/60 px-1 py-0.5 rounded border border-emerald-800/50">.jar</code> from phone storage. <span class="text-slate-400">(Node.js and Python: experimental.)</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Mobile Downward Connector (1 -> 2) -->
+      <div class="sm:hidden flex items-center justify-center py-1 text-emerald-400" aria-hidden="true">
+        <div class="flex flex-col items-center gap-0.5">
+          <span class="w-0.5 h-5 bg-gradient-to-b from-emerald-500 to-cyan-500"></span>
+          <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+        </div>
+      </div>
+
+      <!-- ================= STEP 2: Bottom-Left Vertex ================= -->
+      <div class="sm:absolute sm:bottom-0 sm:left-1 md:left-4 lg:left-6 w-full sm:w-[280px] md:w-[310px] lg:w-[340px] z-20 group">
+        <div class="p-5 sm:p-6 rounded-2xl bg-brand-850 border border-brand-border hover:border-cyan-500/60 transition-all duration-300 shadow-xl backdrop-blur-md relative overflow-hidden group-hover:shadow-cyan-500/10">
+          <div class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-500 to-transparent"></div>
+          <div class="flex items-center gap-3.5 mb-3">
+            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 text-slate-950 font-extrabold text-sm sm:text-base flex items-center justify-center shadow-lg shadow-cyan-500/25 ring-2 ring-cyan-400/30 shrink-0">
+              2
+            </div>
+            <div>
+              <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-cyan-400">Step 02</span>
+              <h3 class="text-base font-bold text-white group-hover:text-cyan-300 transition-colors">Paste Cloudflare Token</h3>
+            </div>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            In <a href="https://dash.cloudflare.com" target="_blank" rel="noopener noreferrer" class="text-cyan-300 underline underline-offset-2 hover:text-white">Cloudflare Zero Trust</a>, add a public hostname pointing to your local port, then paste the tunnel token into HostTriangle.
+          </p>
+        </div>
+      </div>
+
+      <!-- Mobile Downward Connector (2 -> 3) -->
+      <div class="sm:hidden flex items-center justify-center py-1 text-cyan-400" aria-hidden="true">
+        <div class="flex flex-col items-center gap-0.5">
+          <span class="w-0.5 h-5 bg-gradient-to-b from-cyan-500 to-emerald-500"></span>
+          <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+        </div>
+      </div>
+
+      <!-- ================= STEP 3: Bottom-Right Vertex ================= -->
+      <div class="sm:absolute sm:bottom-0 sm:right-1 md:right-4 lg:right-6 w-full sm:w-[280px] md:w-[310px] lg:w-[340px] z-20 group">
+        <div class="p-5 sm:p-6 rounded-2xl bg-brand-850 border border-brand-border hover:border-emerald-500/60 transition-all duration-300 shadow-xl backdrop-blur-md relative overflow-hidden group-hover:shadow-emerald-500/10">
+          <div class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-emerald-400 to-transparent"></div>
+          <div class="flex items-center gap-3.5 mb-3">
+            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 text-slate-950 font-extrabold text-sm sm:text-base flex items-center justify-center shadow-lg shadow-emerald-500/25 ring-2 ring-emerald-400/30 shrink-0">
+              3
+            </div>
+            <div>
+              <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-400">Step 03</span>
+              <h3 class="text-base font-bold text-white group-hover:text-emerald-300 transition-colors">Tap Start & Go Live</h3>
+            </div>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            Tap Start Engine and use your public HTTPS URL in your frontend client or mobile app.
+          </p>
+        </div>
+      </div>
+
+      <!-- Mobile Loopback Badge -->
+      <div class="sm:hidden mt-2 flex justify-center" aria-hidden="true">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-950/70 border border-cyan-500/40 text-cyan-300 text-xs font-mono shadow-sm">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          <span>Public HTTPS URL Active</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= FAQ SECTION (ACCORDION) ================= -->
+  <section id="faq" class="py-20 bg-brand-900/30 border-t border-brand-border">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center space-y-3 mb-14">
+        <span class="text-xs font-mono font-semibold uppercase tracking-wider text-emerald-400">Frequently Asked Questions</span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Got Questions? We Have Answers</h2>
+      </div>
+
+      <div class="space-y-4">
+        <!-- FAQ 1 -->
+        <div class="rounded-xl bg-brand-850 border border-brand-border overflow-hidden">
+          <button onclick="toggleFaq(1)" class="w-full p-5 text-left font-semibold text-white flex items-center justify-between hover:text-emerald-400 transition">
+            <span>Does HostTriangle require root access or custom ROMs?</span>
+            <svg id="faq-icon-1" class="w-4 h-4 text-slate-400 transition-transform transform rotate-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+          <div id="faq-content-1" class="hidden px-5 pb-5 text-sm text-slate-300 leading-relaxed border-t border-brand-border/60 pt-3">
+            No. HostTriangle runs 100% rootless using PRoot user-space virtualization and standard Android application permissions. Your device warranty, Knox/SafetyNet status, and security posture remain completely intact.
+          </div>
+        </div>
+
+        <!-- FAQ 2 -->
+        <div class="rounded-xl bg-brand-850 border border-brand-border overflow-hidden">
+          <button onclick="toggleFaq(2)" class="w-full p-5 text-left font-semibold text-white flex items-center justify-between hover:text-emerald-400 transition">
+            <span>Will running a backend server damage my battery or cause overheating?</span>
+            <svg id="faq-icon-2" class="w-4 h-4 text-slate-400 transition-transform transform rotate-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+          <div id="faq-content-2" class="hidden px-5 pb-5 text-sm text-slate-300 leading-relaxed border-t border-brand-border/60 pt-3">
+            HostTriangle includes real-time battery and thermal monitoring in the Vitals tab. Modern smartphone silicon draws less than 1.5–3 Watts at idle compute. We recommend keeping the phone connected to a standard low-wattage (5W–10W) charger with Android's "Battery Protect" (80% or 85% limit) enabled.
+          </div>
+        </div>
+
+        <!-- FAQ 3 -->
+        <div class="rounded-xl bg-brand-850 border border-brand-border overflow-hidden">
+          <button onclick="toggleFaq(3)" class="w-full p-5 text-left font-semibold text-white flex items-center justify-between hover:text-emerald-400 transition">
+            <span>Can I host a database directly on the phone?</span>
+            <svg id="faq-icon-3" class="w-4 h-4 text-slate-400 transition-transform transform rotate-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+          <div id="faq-content-3" class="hidden px-5 pb-5 text-sm text-slate-300 leading-relaxed border-t border-brand-border/60 pt-3">
+            While local SQLite works smoothly, we strongly recommend a modern stateless architecture: host your relational or document database on free managed tiers (such as Supabase, Neon PostgreSQL, or MongoDB Atlas), and use HostTriangle for stateless compute. This guarantees zero data loss if your phone restarts.
+          </div>
+        </div>
+
+        <!-- FAQ 4 -->
+        <div class="rounded-xl bg-brand-850 border border-brand-border overflow-hidden">
+          <button onclick="toggleFaq(4)" class="w-full p-5 text-left font-semibold text-white flex items-center justify-between hover:text-emerald-400 transition">
+            <span>Does this work over cellular 4G/5G data or only Wi-Fi?</span>
+            <svg id="faq-icon-4" class="w-4 h-4 text-slate-400 transition-transform transform rotate-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+          <div id="faq-content-4" class="hidden px-5 pb-5 text-sm text-slate-300 leading-relaxed border-t border-brand-border/60 pt-3">
+            It works seamlessly on both! Cloudflare Zero Trust Tunnels establish an outbound TLS connection over standard port 443, which automatically bypasses cellular carrier CGNAT, ISP firewalls, and home router NAT without opening any inbound ports.
+          </div>
+        </div>
+
+        <!-- FAQ 5 -->
+        <div class="rounded-xl bg-brand-850 border border-brand-border overflow-hidden">
+          <button onclick="toggleFaq(5)" class="w-full p-5 text-left font-semibold text-white flex items-center justify-between hover:text-emerald-400 transition">
+            <span>Is HostTriangle safe to use for college or commercial projects?</span>
+            <svg id="faq-icon-5" class="w-4 h-4 text-slate-400 transition-transform transform rotate-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+          <div id="faq-content-5" class="hidden px-5 pb-5 text-sm text-slate-300 leading-relaxed border-t border-brand-border/60 pt-3">
+            Yes. HostTriangle is 100% Free and Open Source under the GNU GPL-3.0-only license. It is designed for students, hobbyists, and developers. As with any self-hosted infrastructure, users are responsible for the legal compliance and security of the backends they choose to run.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ================= FOOTER & LEGAL NOTICES ================= -->
+  <footer class="pt-16 pb-12 bg-brand-950 border-t border-brand-border text-xs text-slate-400">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 pb-10 border-b border-brand-border/60">
+        <!-- Col 1: Brand Info -->
+        <div class="space-y-3 col-span-2 md:col-span-1">
+          <div class="flex items-center space-x-2.5">
+            <img src="assets/hosttriangle_icon.png" alt="HostTriangle" class="w-8 h-8 rounded-lg border border-brand-border" />
+            <img src="assets/hosttriangle_text.png" alt="HostTriangle" class="h-5 w-auto object-contain" />
+          </div>
+          <p class="text-[11px] text-slate-400 leading-relaxed">
+            Turn a spare Android phone into a free host for student and hobby backends. No VPS, no cloud bill. Early beta.
+          </p>
+          <div class="text-[11px] font-mono text-emerald-400">
+            Version: v0.1.0-beta.1
+          </div>
+        </div>
+
+        <!-- Col 2: Product -->
+        <div class="space-y-2">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-200">Product</h4>
+          <ul class="space-y-1.5 text-slate-400">
+            <li><a href="https://github.com/itzabhishekgour/HostTriangle/releases/download/v0.1.0-beta.1/HostTriangle-v0.1.0-beta.1-release.apk" target="_blank" rel="noopener noreferrer" class="hover:text-emerald-400 transition">Download APK</a></li>
+            <li><a href="#architecture" class="hover:text-emerald-400 transition">PRoot Engine</a></li>
+            <li><a href="#comparison" class="hover:text-emerald-400 transition">Cold-Start Comparison</a></li>
+            <li><a href="#screenshots" class="hover:text-emerald-400 transition">Interface Showcase</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 3: Open Source -->
+        <div class="space-y-2">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-200">Open Source</h4>
+          <ul class="space-y-1.5 text-slate-400">
+            <li><a href="https://github.com/itzabhishekgour/HostTriangle" target="_blank" rel="noopener noreferrer" class="hover:text-white transition">GitHub Repository</a></li>
+            <li><a href="https://github.com/itzabhishekgour/HostTriangle/blob/alpha/LICENSE" target="_blank" rel="noopener noreferrer" class="hover:text-white transition">GPL-3.0-only License</a></li>
+            <li><a href="https://github.com/itzabhishekgour/HostTriangle/blob/alpha/THIRD_PARTY_NOTICES.md" target="_blank" rel="noopener noreferrer" class="hover:text-white transition">Third-Party Notices</a></li>
+            <li><a href="https://github.com/itzabhishekgour/HostTriangle/blob/alpha/SECURITY.md" target="_blank" rel="noopener noreferrer" class="hover:text-white transition">Security Policy</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 4: Contact -->
+        <div class="space-y-2">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-200">Support & Contact</h4>
+          <ul class="space-y-1.5 text-slate-400">
+            <li><a href="mailto:support@tinexus.in" class="hover:text-emerald-400 transition">support@tinexus.in</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Legal Compliance Disclaimers -->
+      <div class="space-y-3 text-[11px] leading-relaxed text-slate-400">
+        <p>
+          <strong class="text-slate-300">Trademark Notice:</strong> HostTriangle is an independent open-source project. It is not affiliated with, endorsed, sponsored, or certified by Cloudflare, Inc., the Termux project, Google LLC, or Debian. Android is a trademark of Google LLC. Cloudflare is a trademark of Cloudflare, Inc. All other product names, logos, and brands are the property of their respective owners.
+        </p>
+        <p>
+          <strong class="text-slate-300">Intended Use:</strong> HostTriangle is intended for students, hobbyists, indie developers, and small personal or college projects. It is not intended for mission-critical or enterprise systems. You are responsible for the services you host, the commands you run, and for complying with the terms of Cloudflare, your network provider, and applicable law.
+        </p>
+        <p>
+          <strong class="text-slate-300">No Warranty:</strong> This software is provided "AS IS", without warranty of any kind, as described in sections 15 and 16 of the GNU General Public License v3.0.
+        </p>
+        <p>
+          <strong class="text-slate-300">Third-Party Components:</strong> Terminal rendering uses libraries from the Termux project. See <a href="https://github.com/itzabhishekgour/HostTriangle/blob/alpha/THIRD_PARTY_NOTICES.md" target="_blank" rel="noopener noreferrer" class="text-emerald-400 hover:underline">THIRD_PARTY_NOTICES.md</a> for all components and their licenses.
+        </p>
+        <p class="text-slate-400 pt-2 border-t border-brand-border/40">
+          Copyright © 2026 Abhishek Gour (Tinexus). Licensed under the GNU General Public License v3.0 only (GPL-3.0-only). See <a href="https://github.com/itzabhishekgour/HostTriangle/blob/alpha/LICENSE" target="_blank" rel="noopener noreferrer" class="text-emerald-400 hover:underline">LICENSE</a>.
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ================= LIGHTBOX MODAL ================= -->
+  <div id="lightboxModal" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-md flex items-center justify-center p-4" onclick="closeLightbox(event)">
+    <div class="relative max-w-sm sm:max-w-md w-full bg-brand-900 border border-brand-border rounded-2xl p-3 shadow-2xl space-y-2">
+      <div class="flex items-center justify-between pb-1 px-1">
+        <span id="lightboxCaption" class="text-xs font-semibold text-white"></span>
+        <button onclick="document.getElementById('lightboxModal').classList.add('hidden')" class="text-slate-400 hover:text-white text-lg font-bold p-1">
+          &times;
+        </button>
+      </div>
+      <img id="lightboxImage" src="" alt="Zoomed Screenshot" class="w-full h-auto rounded-xl border border-brand-border" />
+    </div>
+  </div>
+
+  <!-- Vanilla Scripts -->
+  <script>
+    // Tab switching for terminal simulator
+    function switchTab(tab) {
+      const tabs = ['spring', 'ingress', 'vitals'];
+      tabs.forEach(t => {
+        document.getElementById('view-' + t).classList.add('hidden');
+        const tabBtn = document.getElementById('tab-' + t);
+        tabBtn.classList.remove('bg-brand-800', 'text-emerald-400', 'font-semibold');
+        tabBtn.classList.add('text-slate-400');
+      });
+
+      document.getElementById('view-' + tab).classList.remove('hidden');
+      const activeBtn = document.getElementById('tab-' + tab);
+      activeBtn.classList.add('bg-brand-800', 'text-emerald-400', 'font-semibold');
+      activeBtn.classList.remove('text-slate-400');
+    }
+
+    // Mobile Hamburger Menu Toggle
+    function toggleMobileMenu() {
+      const menu = document.getElementById('mobileMenu');
+      menu.classList.toggle('hidden');
+    }
+    document.getElementById('mobileMenuBtn').addEventListener('click', toggleMobileMenu);
+
+    // FAQ Accordion Toggle
+    function toggleFaq(id) {
+      const content = document.getElementById('faq-content-' + id);
+      const icon = document.getElementById('faq-icon-' + id);
+      const isHidden = content.classList.contains('hidden');
+
+      // Close all first
+      for (let i = 1; i <= 5; i++) {
+        const c = document.getElementById('faq-content-' + i);
+        const ic = document.getElementById('faq-icon-' + i);
+        if (c && ic) {
+          c.classList.add('hidden');
+          ic.classList.remove('rotate-180');
+        }
+      }
+
+      if (isHidden) {
+        content.classList.remove('hidden');
+        icon.classList.add('rotate-180');
+      }
+    }
+
+    // Lightbox modal functions
+    function openLightbox(src, caption) {
+      document.getElementById('lightboxImage').src = src;
+      document.getElementById('lightboxCaption').textContent = caption;
+      document.getElementById('lightboxModal').classList.remove('hidden');
+    }
+
+    function closeLightbox(e) {
+      if (e.target.id === 'lightboxModal') {
+        document.getElementById('lightboxModal').classList.add('hidden');
+      }
+    }
+
+    // Keyboard ESC to close modal
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        document.getElementById('lightboxModal').classList.add('hidden');
+      }
+    });
+
+    // Copy to clipboard with visual feedback
+    function copyToClipboard(elementId, btn) {
+      const text = document.getElementById(elementId).innerText.trim();
+      navigator.clipboard.writeText(text).then(() => {
+        const originalText = btn.innerText;
+        btn.innerText = 'Copied!';
+        btn.classList.add('bg-emerald-600', 'text-white');
+        setTimeout(() => {
+          btn.innerText = originalText;
+          btn.classList.remove('bg-emerald-600', 'text-white');
+        }, 2000);
+      });
+    }
+  </script>
+
+</body>
+</html>
