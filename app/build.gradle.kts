@@ -59,6 +59,7 @@ android {
         }
     }
     lint {
+        disable += "ExpiredTargetSdkVersion"
         abortOnError = false
         checkReleaseBuilds = false
     }

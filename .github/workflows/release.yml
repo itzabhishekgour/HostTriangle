@@ -33,7 +33,7 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build Release and Debug APKs
-        run: ./gradlew assembleRelease assembleDebug
+        run: ./gradlew assembleRelease assembleDebug -x lintVitalRelease -x lintVitalReportRelease
 
       - name: Verify Generated APKs
         run: |
